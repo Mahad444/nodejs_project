@@ -9,9 +9,14 @@ routes.put('/students/:id', (req, res)=>{
     res.send ({type:'Update Request'});
 });
 // === DELETE A STUDENTS FROM DATABASE ===
-routes.delete('/students/:id', (req, res)=>{
-    res.send ({type:'Delete Request'});
+// routes.delete('/students/:id', (req, res)=>{
+//     res.send ({type:'Delete Request'});
+// });
+routes.delete('/students/:id', (req, res,next)=>{
+    Student.findByIdAndRemove({_id:req.params.id}).then((student)=>
+    { res.send(student)});
 });
+
 const Student = require ('../Models/students');
 
 // add student to the DB
