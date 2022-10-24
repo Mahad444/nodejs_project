@@ -2,16 +2,16 @@
 // password: type:string required true
 const mongoose =require("mongoose");
 const Schema = mongoose.Schema ;
-const bycrypt =require('bcrypt')
+const bycrypt = require('bcrypt')
 
 const userSchema = new Schema({
     // Email
-    email :({
+    email :{
     type:String,
     lowercase:true,
     unique:true,     
     required:true
-    }),
+    },
     // Password
     password:{
         type:String,
@@ -31,7 +31,12 @@ userSchema.pre('save', async function(next){
 });
 
  userSchema.methods.isValidPassword = async function(password){
-
+    try{
+        return await bycrypt.compare(password,this.password);
+    }catch(error){
+        throw error;
+    }
+    
  }
 const User = mongoose.model('user',userSchema);
 module.exports = User;
