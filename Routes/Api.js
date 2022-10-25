@@ -1,8 +1,14 @@
 const express = require ('express');
 const routes = express.Router();
+const creatError = require ('http-errors');
+ const authSchema =require ('../Authentication/auth_schema');
+const User = require ('../Models/user');
+const { signAccessToken, verifyAccesToken } = require('../Authentication/jwtHelper');
+
+
 
 // === GET A LIST OF STUDENTS FROM DATABASE ===
-routes.get('/students', (req, res)=>{
+routes.get('/students',verifyAccesToken,(req, res)=>{
     res.send ({type:'Get Request'});
 });
 // === UPDATE STUDENTS IN DATABASE ===
@@ -56,10 +62,6 @@ const Student = require ('../Models/students');
 // }
     
 // })
-const creatError = require ('http-errors');
- const authSchema =require ('../Authentication/auth_schema');
-const User = require ('../Models/user');
-const { signAccessToken } = require('../Authentication/jwtHelper');
 
 routes.post('/user', async(req,res,next)=>{
     try{
@@ -74,8 +76,8 @@ routes.post('/user', async(req,res,next)=>{
 
      const savedUser = user.save()
 
-     res.send("savedUser");
-     const accessToken = await accessToken(savedUser.id)
+    //  res.send("savedUser");
+     const accessToken = await signAccessToken(savedUser.id)
      res.send({accessToken});
 } catch(err){
     next(err);
@@ -102,6 +104,8 @@ routes.post('/user', async(req,res,next)=>{
         next(error)
     }
  })
+
+
 
 
 module.exports = routes;
