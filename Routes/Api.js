@@ -3,13 +3,17 @@ const routes = express.Router();
 const creatError = require ('http-errors');
  const authSchema =require ('../Authentication/auth_schema');
 const User = require ('../Models/user');
-const { signAccessToken, verifyAccesToken } = require('../Authentication/jwtHelper');
-
+const { signAccessToken, verifyAccesToken ,signRefreshToken} = require('../Authentication/jwtHelper');
+const mwanafunzi = require ('../Models/students')
+// const {accessToken} = require ('./Authentication/auth_schema')
 
 
 // === GET A LIST OF STUDENTS FROM DATABASE ===
 routes.get('/students',verifyAccesToken,(req, res)=>{
-    res.send ({type:'Get Request'});
+    mwanafunzi.find({}).then((Student)=>{
+        res.send (Student);
+    })
+    
 });
 // === UPDATE STUDENTS IN DATABASE ===
 //   routes.put('/student/:id', (req, res)=>{
@@ -76,7 +80,7 @@ routes.post('/user', async(req,res,next)=>{
 
      const savedUser = user.save()
 
-    //  res.send("savedUser");
+     res.send("savedUser");
      const accessToken = await signAccessToken(savedUser.id)
      res.send({accessToken});
 } catch(err){
@@ -96,8 +100,10 @@ routes.post('/user', async(req,res,next)=>{
      if (!isMatch) throw creatError.Unauthorized("Username or Password is not valid");
 
      const accessToken = await signAccessToken(user.id);
+     const refreshToken = await signRefreshToken(user.id)
+
     //  const refreshToken = await signRefreshToken (user.id);
-    res.send({accessToken})        
+    res.send({accessToken,refreshToken})        
     } catch(error) {
         if (error.isJoi===true) 
         return next (creatError.BadRequest("Invalid Username or Password"))
