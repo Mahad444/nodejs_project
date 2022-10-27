@@ -80,7 +80,7 @@ routes.post('/user', async(req,res,next)=>{
 
      const savedUser = user.save()
 
-     res.send("savedUser");
+    //  res.send("savedUser");
      const accessToken = await signAccessToken(savedUser.id)
      res.send({accessToken});
 } catch(err){
