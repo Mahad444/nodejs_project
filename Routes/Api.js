@@ -5,13 +5,15 @@ const creatError = require ('http-errors');
 const User = require ('../Models/user');
 const { signAccessToken, verifyAccesToken ,signRefreshToken} = require('../Authentication/jwtHelper');
 const mwanafunzi = require ('../Models/students')
+const Student = require ('../Models/students');
+
 // const {accessToken} = require ('./Authentication/auth_schema')
 
 
 // === GET A LIST OF STUDENTS FROM DATABASE ===
 routes.get('/students',verifyAccesToken,(req, res)=>{
     mwanafunzi.find({}).then((Student)=>{
-        res.send (Student);
+        res.send (Student);   
     })
     
 });
@@ -36,7 +38,6 @@ routes.delete('/students/:id', (req, res,next)=>{
     { res.send(student)});
 });
 
-const Student = require ('../Models/students');
 
 // add student to the DB
  routes.post('/students',(req,res)=>{
@@ -44,7 +45,11 @@ const Student = require ('../Models/students');
          res.send(mwanafunzi);
     })
  })
-
+routes.get('/user',verifyAccesToken,async(req,res)=>{
+    User.find({}).then((User)=>{
+        res.send(User)
+    })
+})
 // routes.post('/user', async (req, res,next) =>{
 //     try{
 //     const{email,password} = req.body;
@@ -67,7 +72,7 @@ const Student = require ('../Models/students');
     
 // })
 
-routes.post('/user', async(req,res,next)=>{
+routes.post('/user',async(req,res,next)=>{
     try{
     //    const{email,password} = req.body;
      const {email,password} = await authSchema.validateAsync(req.body);
@@ -80,7 +85,7 @@ routes.post('/user', async(req,res,next)=>{
 
      const savedUser = user.save()
 
-    //  res.send("savedUser");
+    // res.send("savedUser");
      const accessToken = await signAccessToken(savedUser.id)
      res.send({accessToken});
 } catch(err){
@@ -107,7 +112,7 @@ routes.post('/user', async(req,res,next)=>{
     } catch(error) {
         if (error.isJoi===true) 
         return next (creatError.BadRequest("Invalid Username or Password"))
-        next(error)
+        next(error);
     }
  })
 

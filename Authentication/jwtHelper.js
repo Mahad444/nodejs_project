@@ -11,7 +11,7 @@ module.exports ={
             const options ={
                 expiresIn :'1hr',
                 issuer:'Duke Technologies.com',
-                audience:UserId,
+                audience:`${UserId}`,
             }
             JWT.sign(payload,secret,options,(error,token)=>{
                 if(error) reject(error);
@@ -37,13 +37,14 @@ module.exports ={
 
 //  Middleware to verify token
 verifyAccesToken:(req,res,next)=>{
-    if (!req.headers["authorization"])return next (creatError.Unauthorized());
+    if (!req.headers["authorization"])
+    return next (creatError.Unauthorized());
     const authHeader = req.headers["authorization"];
     const bearerToken =authHeader.split(' ');
     const token = bearerToken[1];
     JWT.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,payload)=>{
         if(err){
-            return next(creatError.Unauthorized())
+            return next(creatError.Unauthorized("Unauthorized User"))
         }
         req.payload = payload;
         next()

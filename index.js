@@ -2,8 +2,12 @@ const express = require ('express');
 const routes = require ('./Routes/Api');
 const app = express ();
 const bodyParser =require ('body-parser');
+const cors = require ("cors");
 app.use(bodyParser.json()) ; 
 // THIS SHOULD BE ABOVE app.use(routes);
+app.use(cors({
+   origin :"http://localhost:3000"
+}));
 app.use(routes); 
 app.use((err,req,res,next)=>{
    res.status(422).send({error:err.message});
