@@ -3,7 +3,7 @@ const routes = express.Router();
 const creatError = require ('http-errors');
  const authSchema =require ('../Authentication/auth_schema');
 const User = require ('../Models/user');
-const { signAccessToken, verifyAccesToken ,signRefreshToken} = require('../Authentication/jwtHelper');
+const { signAccessToken, verifyAccesToken,verifyRefreshToken ,signRefreshToken} = require('../Authentication/jwtHelper');
 const mwanafunzi = require ('../Models/students')
 const Student = require ('../Models/students');
 
@@ -109,6 +109,24 @@ routes.post('/user',async(req,res,next)=>{
 
     //  const refreshToken = await signRefreshToken (user.id);
     res.send({accessToken,refreshToken})        
+    } catch(error) {
+        if (error.isJoi===true) 
+        return next (creatError.BadRequest("Invalid Username or Password"))
+        next(error);
+    }
+ })
+
+ routes.post('/refresh-token',async (req,res,next)=>{
+    try{
+     const {refreshToken} = req.body ;
+     if(!refreshToken) throw creatError.BadRequest();
+
+     const userId = await verifyRefreshToken(refreshToken)
+     const accessToken = await signAccessToken(userId);
+     const refToken = await signRefreshToken(userId)
+
+    //  const refreshToken = await signRefreshToken (user.id);
+    res.send({accessToken:accessToken,refreshToken:refToken})        
     } catch(error) {
         if (error.isJoi===true) 
         return next (creatError.BadRequest("Invalid Username or Password"))

@@ -1,6 +1,7 @@
 const JWT= require ('jsonwebtoken');
-const creatError = require ('http-errors')
-const User = require ('../Models/user');
+const creatError = require ('http-errors');
+const { reject } = require('bcrypt/promises');
+// const User = require ('../Models/user');
 require("dotenv").config()
 
 module.exports ={
@@ -9,7 +10,7 @@ module.exports ={
             const payload ={}
             const secret = process.env.ACCESS_TOKEN_SECRET;
             const options ={
-                expiresIn :'1hr',
+                expiresIn :'1m',
                 issuer:'Duke Technologies.com',
                 audience:`${UserId}`,
             }
@@ -50,4 +51,17 @@ verifyAccesToken:(req,res,next)=>{
         next()
     })
 },
+
+verifyRefreshToken:(refreshToken)=>{
+    return new Promise((resolve,reject)=>{
+        JWT.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET,(err,payload)=>{
+            if(err){
+                return reject(creatError.Unauthorized())
+            }
+            const UserId = payload.aud;
+            resolve(UserId)
+        });
+    });
+    
+}
 }
