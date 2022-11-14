@@ -1,22 +1,14 @@
 const express = require ('express');
 const routes = express.Router();
-const creatError = require ('http-errors');
- const authSchema =require ('../Authentication/auth_schema');
-const User = require ('../Models/user');
-const { signAccessToken, verifyAccesToken,verifyRefreshToken ,signRefreshToken} = require('../Authentication/jwtHelper');
-const mwanafunzi = require ('../Models/students')
-const Student = require ('../Models/students');
+const {verifyAccesToken,verifyRefreshToken} = require('../Authentication/jwtHelper')
+const userController = require('../Controllers/usercontroller')
+const User = require('../Models/user')
 
 // const {accessToken} = require ('./Authentication/auth_schema')
 
 
 // === GET A LIST OF STUDENTS FROM DATABASE ===
-routes.get('/students',verifyAccesToken,(req, res)=>{
-    mwanafunzi.find({}).then((Student)=>{
-        res.send (Student);   
-    })
-    
-});
+routes.get('/students',verifyAccesToken,);
 // === UPDATE STUDENTS IN DATABASE ===
 //   routes.put('/student/:id', (req, res)=>{
     // res.send ({type:'Update Request'});
@@ -50,91 +42,13 @@ routes.get('/user',verifyAccesToken,async(req,res)=>{
         res.send(User)
     })
 })
-// routes.post('/user', async (req, res,next) =>{
-//     try{
-//     const{email,password} = req.body;
 
-//     const results = await authSchema.validateAsync(req.body);
-
-//     const exists = await User.findOne({email:email});
-
-//     if(exists) throw creatError.Conflict(`${email}has already been registered`);
-
-//     const user = new User(results); 
-//     const savedUser = await  user.save()
-//      res.send("savedUser");
-
-//     const accessToken = await signAccessToken(savedUser.id)
-//     res.send({accessToken});
-// } catch(err){
-//     next(err);
-// }
-    
-// })
-
-routes.post('/user',async(req,res,next)=>{
-    try{
-    //    const{email,password} = req.body;
-     const {email,password} = await authSchema.validateAsync(req.body);
-
-     const exists = await User.findOne({email:email});
-
-     if(exists) throw creatError.Conflict(`${email} has already been registered`);
-
-     const user = new User({email,password}); 
-
-     const savedUser = user.save()
-
-    // res.send("savedUser");
-     const accessToken = await signAccessToken(savedUser.id)
-     res.send({accessToken});
-} catch(err){
-    next(err);
-     
-    }
- })
+routes.post('/user',userController.User)
 
 
- routes.post('/login',async (req,res,next)=>{
-    try{
-     const {email,password} = await authSchema.validateAsync(req.body);
-     const user = await User.findOne({email:email});
-     if(!user) throw creatError.NotFound(`user not registered`);
+ routes.post('/login',userController.login)
 
-     const isMatch = await user.isValidPassword(password);
-     if (!isMatch) throw creatError.Unauthorized("Username or Password is not valid");
-
-     const accessToken = await signAccessToken(user.id);
-     const refreshToken = await signRefreshToken(user.id)
-
-    //  const refreshToken = await signRefreshToken (user.id);
-    res.send({accessToken,refreshToken})        
-    } catch(error) {
-        if (error.isJoi===true) 
-        return next (creatError.BadRequest("Invalid Username or Password"))
-        next(error);
-    }
- })
-
- routes.post('/refresh-token',async (req,res,next)=>{
-    try{
-     const {refreshToken} = req.body ;
-     if(!refreshToken) throw creatError.BadRequest();
-
-     const userId = await verifyRefreshToken(refreshToken)
-     const accessToken = await signAccessToken(userId);
-     const refToken = await signRefreshToken(userId)
-
-    //  const refreshToken = await signRefreshToken (user.id);
-    res.send({accessToken:accessToken,refreshToken:refToken})        
-    } catch(error) {
-        if (error.isJoi===true) 
-        return next (creatError.BadRequest("Invalid Username or Password"))
-        next(error);
-    }
- })
-
-
+ routes.post('/refresh-token',verifyRefreshToken,userController.refresh)
 
 
 module.exports = routes;
