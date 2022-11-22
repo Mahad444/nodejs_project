@@ -2,7 +2,9 @@ const express = require ('express');
 const routes = require ('./Routes/Api');
 const app = express ();
 const bodyParser =require ('body-parser');
+const mongoose =require('mongoose');
 const cors = require ("cors");
+
 app.use(bodyParser.json()) ; 
 // THIS SHOULD BE ABOVE app.use(routes);
 app.use(cors({
@@ -12,7 +14,7 @@ app.use(routes);
 app.use((err,req,res,next)=>{
    res.status(422).send({error:err.message});
 });
-const mongoose =require('mongoose');
+
 // THIS SHOULD BE ABOVE app.listen
 // This will connect to mongo DB and create studentDb
 app.listen(process.env.port ||4000,()=>{
