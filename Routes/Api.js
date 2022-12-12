@@ -2,13 +2,14 @@ const express = require ('express');
 const routes = express.Router();
 const {verifyAccesToken,verifyRefreshToken} = require('../Authentication/jwtHelper')
 const userController = require('../Controllers/usercontroller')
+// const studentController = require("../Controllers/studentController")
 const User = require('../Models/user')
 
 // const {accessToken} = require ('./Authentication/auth_schema')
 
 
 // === GET A LIST OF STUDENTS FROM DATABASE ===
-routes.get('/students',verifyAccesToken,);
+routes.get('/students',verifyAccesToken);
 // === UPDATE STUDENTS IN DATABASE ===
 //   routes.put('/student/:id', (req, res)=>{
     // res.send ({type:'Update Request'});
