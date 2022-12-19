@@ -17,7 +17,7 @@ app.use((err,req,res,next)=>{
 
 // THIS SHOULD BE ABOVE app.listen
 // This will connect to mongo DB and create studentDb
-app.listen(process.env.port ||4000,()=>{
+app.listen(process.env.port || 4000,()=>{
    console.log(("Now Listening For Requests On:http://localhost:4000"));
 });
 
